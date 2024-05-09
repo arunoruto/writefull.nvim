@@ -2,9 +2,8 @@
 
 I recently stumbled upon writefull, an amazing tool to aid you in your academic writing. It has plugins for overleaf and word, but lacks one for nvim or vscode. Since I have never written a plugin for (neo)vim before, I will take this as a chance to learn it a bit!
 
-This repo will be used to gather information and ideas, before I have time to implement this!
-
 # Current state
+
 - Using `WritefullToken` a new tab will be opened where the `Firebase-Token` can be inserted. This file needs to be created at least. If it is empty, errors will be thrown.
 - Go into visual mode `v` and select a text snippet to be rephrased. By hitting `<leader>wr` (writefull rephrase), a request will be made, and the response will be printed out (for now).
 
