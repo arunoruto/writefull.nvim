@@ -1,0 +1,2 @@
+Blue noise
+sample patterns — for example produced by Poisson disk distributions, where all samples are at least distance r apart for some user-supplied density parameter $r$ — are generally considered ideal for many applications in rendering (see Cook’s landmark paper for example [1986]). Unfortunately, the naive rejection-based approach for generating Poisson disk samples, dart throwing, is impractically inefficient.
