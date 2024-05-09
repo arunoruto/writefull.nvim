@@ -84,3 +84,15 @@ My current idea is to make writefull available when being in visual mode. One wo
 ## Auth
 
 For now, writefull has no official API documentation. But the Firebase Token can be used to make queries and the token can be provided using a command like `:writefull (firebase-)token <token>`. I will see how often this token changes. If it isn't renewed that often, one can manually always provide it, until we get an official API on how to do this!
+
+# Development
+
+Most of these things may seem trivial for you, but I am still learning and I need a place to put all my thoughts down.
+
+## Use plugin locally
+
+We need to adjust the runtime path to include the local directory. The root of this repository has to be included:
+
+```sh
+nvim --cmd "set rtp+=./"
+```
