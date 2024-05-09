@@ -4,6 +4,10 @@ I recently stumbled upon writefull, an amazing tool to aid you in your academic 
 
 This repo will be used to gather information and ideas, before I have time to implement this!
 
+# Current state
+- Using `WritefullToken` a new tab will be opened where the `Firebase-Token` can be inserted. This file needs to be created at least. If it is empty, errors will be thrown.
+- Go into visual mode `v` and select a text snippet to be rephrased. By hitting `<leader>wr` (writefull rephrase), a request will be made, and the response will be printed out (for now).
+
 # API
 
 I am using the writefull integration into overleaf and analyzed the network a bit. So, what is needed to communicate with writefull?
@@ -83,7 +87,7 @@ My current idea is to make writefull available when being in visual mode. One wo
 
 ## Auth
 
-For now, writefull has no official API documentation. But the Firebase Token can be used to make queries and the token can be provided using a command like `:writefull (firebase-)token <token>`. I will see how often this token changes. If it isn't renewed that often, one can manually always provide it, until we get an official API on how to do this!
+For now, writefull has no official API documentation. But the Firebase Token can be used to make queries and the token can be provided using a command like `:writefull (firebase-)token <token>`. The token is renewed quite often, so this is only feasible for local development.
 
 # Development
 
