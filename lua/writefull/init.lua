@@ -1,19 +1,22 @@
 local open = io.open
 local curl = require("plenary.curl")
+local dialog = require("writefull.dialog")
+local wtoken = require("writefull.token")
 
-local writefull_url = "https://nlp.writefull.ai/prompt"
-
-local function read_writefull_token()
-	local token
-	local file = open(vim.fn.stdpath("data") .. "/writefull-token.txt", "rb")
-	if not file then
-		print("Plase run WritefullToken and provide a token")
-		return nil
-	end
-	token = file:read("*all")
-	file:close()
-	return token:gsub("%s+", "")
-end
+local ansi_colors = {
+	removed = {
+		start = "\x1b[91m\x1b[9m",
+		stop = "\x1b[39m\x1b[29m",
+	},
+	added = {
+		start = "\x1b[92m",
+		stop = "\x1b[39m",
+	},
+	unchanged = {
+		start = "",
+		stop = "",
+	},
+}
 
 local function get_preceding_chars(line, col)
 	-- Get all lines
@@ -31,8 +34,16 @@ local function get_preceding_chars(line, col)
 	return preceding_chars
 end
 
-local function writefull_rephrase(pos_start, pos_end)
-	local token = read_writefull_token()
+local function create_string_from_deltas(deltas)
+	local output = ""
+	for i, v in ipairs(deltas) do
+		output = output .. ansi_colors[v.type].start .. v.value .. ansi_colors[v.type].stop
+	end
+	return output
+end
+
+local function rephrase(pos_start, pos_end)
+	local token = wtoken.access_token_read()
 	if not token then
 		return
 	end
@@ -66,21 +77,31 @@ local function writefull_rephrase(pos_start, pos_end)
 		},
 	}
 
-	local res = curl.post(writefull_url, opts)
+	local res = curl.post(wtoken.writefull_url, opts)
+	if res.status ~= 200 then
+		error(
+			"Error at retrieving rephrase data. Request data: "
+				.. vim.fn.json_encode(opts)
+				.. ". Response data: "
+				.. vim.fn.json_encode(res)
+		)
+	end
 	local res_body = vim.fn.json_decode(res.body)
 
 	-- vim.api.nvim_echo({ { buff .. "\n" }, { tostring(char_start) .. ", " }, { tostring(char_end) } }, false, {})
 	-- print(res.body)
-	print(vim.fn.json_encode(res))
+	print('Rephrase retrieved and put in " register')
+	vim.fn.setreg('"', res_body.result[1].value)
+
+	local output = create_string_from_deltas(res_body.result[1].deltas)
+	output = output:gsub("\n", "\\n")
+	print(output)
+	dialog.change_preview(output)
 end
 
 -- Define a custom command to trigger data fetch
-vim.api.nvim_create_user_command("FetchData", writefull_rephrase, { nargs = "?" })
-vim.api.nvim_create_user_command(
-	"WritefullToken",
-	"tabnew " .. vim.fn.stdpath("data") .. "/writefull-token.txt",
-	{ nargs = "?" }
-)
+-- vim.api.nvim_create_user_command("WritefullRephrase", rephrase, { nargs = "?" })
+vim.api.nvim_create_user_command("WritefullToken", "tabnew " .. wtoken.token_path_refresh, { nargs = "?" })
 -- vim.api.nvim_set_keymap("v", "<leader>fd", ":FetchData<CR>", { silent = false })
 
-vim.keymap.set("v", "<leader>wr", writefull_rephrase, { noremap = true })
+vim.keymap.set("v", "<leader>wr", rephrase, { noremap = true })
